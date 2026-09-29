@@ -8,14 +8,9 @@ media/
 htmlcov/
 .coverage
 
-# eigene Tests - nicht Teil der Abgabe (wie KanMind)
+# Own tests
 */tests/
 */api/tests.py
 
-# Demo-/Seed-Daten (wie KanMind: kanban_app/management/)
+# Demo/seed data
 */management/
-
-# nichts von Claude im Repo
-.claude/
-CLAUDE.md
-STATUS.md
