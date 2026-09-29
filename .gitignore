@@ -1,0 +1,21 @@
+venv/
+.vscode/
+db.sqlite3
+__pycache__/
+*.pyc
+.env
+media/
+htmlcov/
+.coverage
+
+# eigene Tests - nicht Teil der Abgabe (wie KanMind)
+*/tests/
+*/api/tests.py
+
+# Demo-/Seed-Daten (wie KanMind: kanban_app/management/)
+*/management/
+
+# nichts von Claude im Repo
+.claude/
+CLAUDE.md
+STATUS.md
