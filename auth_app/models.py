@@ -20,5 +20,10 @@ class Profile(models.Model):
     working_hours = models.CharField(max_length=255, blank=True, default="")
     created_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        verbose_name = "profile"
+        verbose_name_plural = "profiles"
+        ordering = ["user__username"]
+
     def __str__(self):
         return f"{self.user.username} ({self.type})"
