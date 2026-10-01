@@ -27,3 +27,14 @@ class IsBusinessUserOrReadOnly(BasePermission):
         if request.method in SAFE_METHODS:
             return True
         return has_profile_type(request.user, Profile.BUSINESS)
+
+
+class IsCustomerUserOrReadOnly(BasePermission):
+    """Allows reading to everyone, writing only to customer users."""
+
+    message = "Only customer users can perform this action."
+
+    def has_permission(self, request, view):
+        if request.method in SAFE_METHODS:
+            return True
+        return has_profile_type(request.user, Profile.CUSTOMER)
