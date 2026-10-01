@@ -1,10 +1,29 @@
+from decimal import Decimal
+
+from django.db import transaction
 from rest_framework import serializers
 
 from offers_app.models import Offer, OfferDetail
 
+MAX_INT = 2_147_483_647  # largest value of a database integer column
+REQUIRED_OFFER_TYPES = {
+    OfferDetail.BASIC, OfferDetail.STANDARD, OfferDetail.PREMIUM,
+}
+
 
 class OfferDetailSerializer(serializers.ModelSerializer):
-    """Full data of a single offer package."""
+    """Full data of a single offer package; also used for writing."""
+
+    revisions = serializers.IntegerField(min_value=-1, max_value=MAX_INT)
+    delivery_time_in_days = serializers.IntegerField(
+        min_value=1, max_value=MAX_INT
+    )
+    price = serializers.DecimalField(
+        max_digits=10, decimal_places=2, min_value=Decimal("0")
+    )
+    features = serializers.ListField(
+        child=serializers.CharField(max_length=255), allow_empty=False
+    )
 
     class Meta:
         model = OfferDetail
@@ -75,3 +94,46 @@ class OfferRetrieveSerializer(OfferListSerializer):
             "id", "user", "title", "image", "description", "created_at",
             "updated_at", "details", "min_price", "min_delivery_time",
         ]
+
+
+class OfferWriteSerializer(serializers.ModelSerializer):
+    """Creates an offer with its three packages or updates parts of it."""
+
+    details = OfferDetailSerializer(many=True)
+
+    class Meta:
+        model = Offer
+        fields = ["id", "title", "image", "description", "details"]
+
+    def validate_details(self, details):
+        types = [detail.get("offer_type") for detail in details]
+        if None in types or len(set(types)) != len(types):
+            raise serializers.ValidationError(
+                "Each detail needs a unique offer_type."
+            )
+        if self.instance is None and set(types) != REQUIRED_OFFER_TYPES:
+            raise serializers.ValidationError(
+                "An offer needs exactly one basic, standard and "
+                "premium detail."
+            )
+        return details
+
+    @transaction.atomic
+    def create(self, validated_data):
+        details = validated_data.pop("details")
+        offer = Offer.objects.create(**validated_data)
+        OfferDetail.objects.bulk_create(
+            OfferDetail(offer=offer, **detail) for detail in details
+        )
+        return offer
+
+    @transaction.atomic
+    def update(self, instance, validated_data):
+        details = validated_data.pop("details", [])
+        instance = super().update(instance, validated_data)
+        for data in details:
+            detail = instance.details.get(offer_type=data["offer_type"])
+            for attr, value in data.items():
+                setattr(detail, attr, value)
+            detail.save()
+        return instance
