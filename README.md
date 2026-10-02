@@ -29,6 +29,17 @@ python manage.py runserver
 The API runs at `http://127.0.0.1:8000/api/`. The frontend is a separate
 project; CORS allows `http://127.0.0.1:5500` and `http://localhost:5500`.
 
+## Guest logins
+
+The frontend's guest login buttons expect these users. The database
+starts empty, so register them once (e.g. via the frontend or
+`POST /api/registration/`):
+
+| Username | Password | Type |
+|---|---|---|
+| `daniel` | `asdasd` | customer |
+| `kevin` | `asdasd` | business |
+
 ## Notes
 
 - Authentication: `Authorization: Token <token>`; login uses the
