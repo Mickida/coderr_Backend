@@ -43,6 +43,7 @@ class OfferDetailLinkSerializer(serializers.ModelSerializer):
         fields = ["id", "url"]
 
     def get_url(self, obj):
+        """Relative URL of the package detail endpoint."""
         return f"/offerdetails/{obj.id}/"
 
 
@@ -77,6 +78,7 @@ class OfferListSerializer(serializers.ModelSerializer):
         ]
 
     def get_user_details(self, obj):
+        """Basic name data of the offer creator."""
         return {
             "first_name": obj.user.first_name,
             "last_name": obj.user.last_name,
@@ -106,6 +108,7 @@ class OfferWriteSerializer(serializers.ModelSerializer):
         fields = ["id", "title", "image", "description", "details"]
 
     def validate_details(self, details):
+        """Requires unique offer types; all three on create."""
         types = [detail.get("offer_type") for detail in details]
         if None in types or len(set(types)) != len(types):
             raise serializers.ValidationError(
@@ -120,6 +123,7 @@ class OfferWriteSerializer(serializers.ModelSerializer):
 
     @transaction.atomic
     def create(self, validated_data):
+        """Creates the offer together with its packages."""
         details = validated_data.pop("details")
         offer = Offer.objects.create(**validated_data)
         OfferDetail.objects.bulk_create(
@@ -129,6 +133,7 @@ class OfferWriteSerializer(serializers.ModelSerializer):
 
     @transaction.atomic
     def update(self, instance, validated_data):
+        """Updates the offer and the packages matched by offer_type."""
         details = validated_data.pop("details", [])
         instance = super().update(instance, validated_data)
         for data in details:

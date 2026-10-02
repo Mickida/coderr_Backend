@@ -22,6 +22,7 @@ class ReviewSerializer(serializers.ModelSerializer):
         read_only_fields = ["reviewer", "created_at", "updated_at"]
 
     def validate_business_user(self, value):
+        """Rejects a second review of the same business user."""
         reviewer = self.context["request"].user
         if Review.objects.filter(business_user=value,
                                  reviewer=reviewer).exists():

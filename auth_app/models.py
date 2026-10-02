@@ -26,4 +26,5 @@ class Profile(models.Model):
         ordering = ["user__username"]
 
     def __str__(self):
+        """Username with profile type."""
         return f"{self.user.username} ({self.type})"

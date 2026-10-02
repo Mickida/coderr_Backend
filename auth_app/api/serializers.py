@@ -22,6 +22,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
         extra_kwargs = {"email": {"required": True, "allow_blank": False}}
 
     def validate_email(self, value):
+        """Rejects an email that is already registered."""
         if User.objects.filter(email__iexact=value).exists():
             raise serializers.ValidationError(
                 "This email is already registered."
@@ -29,12 +30,14 @@ class RegistrationSerializer(serializers.ModelSerializer):
         return value
 
     def validate(self, attrs):
+        """Ensures both password fields match."""
         if attrs["password"] != attrs["repeated_password"]:
             raise serializers.ValidationError("Passwords do not match.")
         return attrs
 
     @transaction.atomic
     def create(self, validated_data):
+        """Creates the user and the profile of the chosen type."""
         validated_data.pop("repeated_password")
         profile_type = validated_data.pop("type")
         user = User.objects.create_user(**validated_data)
@@ -73,6 +76,7 @@ class ProfileSerializer(serializers.ModelSerializer):
         read_only_fields = ["user", "type", "created_at"]
 
     def validate_email(self, value):
+        """Rejects an email used by another user."""
         others = User.objects.exclude(pk=self.instance.user_id)
         if others.filter(email__iexact=value).exists():
             raise serializers.ValidationError(
@@ -82,6 +86,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     @transaction.atomic
     def update(self, instance, validated_data):
+        """Updates the user fields, then the profile fields."""
         user_data = validated_data.pop("user", {})
         for attr, value in user_data.items():
             setattr(instance.user, attr, value)

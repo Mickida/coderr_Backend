@@ -31,4 +31,5 @@ class Review(models.Model):
         ]
 
     def __str__(self):
+        """Reviewer, business user and rating."""
         return f"{self.reviewer} -> {self.business_user}: {self.rating}"

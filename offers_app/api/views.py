@@ -50,11 +50,13 @@ class OfferListView(generics.ListCreateAPIView):
     ordering = ["-updated_at"]
 
     def get_serializer_class(self):
+        """Write serializer for POST, list serializer otherwise."""
         if self.request.method == "POST":
             return OfferWriteSerializer
         return OfferListSerializer
 
     def get_queryset(self):
+        """Offers filtered by creator, minimum price and delivery time."""
         params = self.request.query_params
         filters = {
             "user_id": parse_number(params, "creator_id", int),
@@ -67,6 +69,7 @@ class OfferListView(generics.ListCreateAPIView):
         return annotated_offers().filter(**active)
 
     def perform_create(self, serializer):
+        """Saves the offer for the requesting business user."""
         serializer.save(user=self.request.user)
 
 
@@ -77,9 +80,11 @@ class OfferSingleView(generics.RetrieveUpdateDestroyAPIView):
     http_method_names = ["get", "patch", "delete"]
 
     def get_queryset(self):
+        """Offers with lowest price and fastest delivery annotated."""
         return annotated_offers()
 
     def get_serializer_class(self):
+        """Detail serializer for GET, write serializer otherwise."""
         if self.request.method == "GET":
             return OfferRetrieveSerializer
         return OfferWriteSerializer
@@ -90,3 +95,4 @@ class OfferDetailView(generics.RetrieveAPIView):
 
     queryset = OfferDetail.objects.all()
     serializer_class = OfferDetailSerializer
+    permission_classes = [IsAuthenticated]

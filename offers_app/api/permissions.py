@@ -5,6 +5,7 @@ class IsOfferOwnerOrReadOnly(BasePermission):
     """Allows reading any offer but changing only your own."""
 
     def has_object_permission(self, request, view, obj):
+        """Read for everyone; write only by the offer creator."""
         if request.method in SAFE_METHODS:
             return True
         return obj.user_id == request.user.id

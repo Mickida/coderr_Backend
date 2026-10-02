@@ -20,6 +20,7 @@ class OrderSerializer(serializers.ModelSerializer):
         ]
 
     def validate(self, attrs):
+        """Allows only the status field and requires it."""
         unknown = set(self.initial_data) - {"status"}
         if unknown:
             raise serializers.ValidationError(

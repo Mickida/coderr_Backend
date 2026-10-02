@@ -5,6 +5,7 @@ class IsReviewerOrReadOnly(BasePermission):
     """Allows changing or deleting a review only by its author."""
 
     def has_object_permission(self, request, view, obj):
+        """Read for everyone; write only by the review author."""
         if request.method in SAFE_METHODS:
             return True
         return obj.reviewer_id == request.user.id

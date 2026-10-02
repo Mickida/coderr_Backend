@@ -38,12 +38,14 @@ class OrderListView(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated, IsCustomerUserOrReadOnly]
 
     def get_queryset(self):
+        """Orders where the user is customer or business user."""
         user = self.request.user
         return Order.objects.filter(
             Q(customer_user=user) | Q(business_user=user)
         )
 
     def create(self, request, *args, **kwargs):
+        """Creates an order from the given offer package."""
         serializer = OfferDetailIdSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         detail = get_object_or_404(
@@ -81,6 +83,7 @@ class OrderCountView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, business_user_id):
+        """Responds with the in-progress order count."""
         count = count_orders(business_user_id, Order.IN_PROGRESS)
         return Response({"order_count": count})
 
@@ -91,5 +94,6 @@ class CompletedOrderCountView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, business_user_id):
+        """Responds with the completed order count."""
         count = count_orders(business_user_id, Order.COMPLETED)
         return Response({"completed_order_count": count})

@@ -20,6 +20,7 @@ class Offer(models.Model):
         ordering = ["-updated_at"]
 
     def __str__(self):
+        """Offer title."""
         return self.title
 
 
@@ -55,4 +56,5 @@ class OfferDetail(models.Model):
         ]
 
     def __str__(self):
+        """Offer title with package type."""
         return f"{self.offer.title} ({self.offer_type})"

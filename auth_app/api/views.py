@@ -36,6 +36,7 @@ class RegistrationView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
+        """Registers a user and returns the auth token."""
         serializer = RegistrationSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
@@ -50,6 +51,7 @@ class LoginView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
+        """Checks the credentials and returns the auth token."""
         serializer = LoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = authenticate(request, **serializer.validated_data)
@@ -79,6 +81,7 @@ class BusinessProfileListView(generics.ListAPIView):
         type=Profile.BUSINESS
     )
     serializer_class = BusinessProfileListSerializer
+    permission_classes = [IsAuthenticated]
 
 
 class CustomerProfileListView(generics.ListAPIView):
@@ -88,6 +91,7 @@ class CustomerProfileListView(generics.ListAPIView):
         type=Profile.CUSTOMER
     )
     serializer_class = CustomerProfileListSerializer
+    permission_classes = [IsAuthenticated]
 
 
 class BaseInfoView(APIView):
@@ -96,6 +100,7 @@ class BaseInfoView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request):
+        """Returns review, profile and offer statistics."""
         average = Review.objects.aggregate(avg=Avg("rating"))["avg"]
         return Response({
             "review_count": Review.objects.count(),

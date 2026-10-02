@@ -34,6 +34,7 @@ class ReviewListView(generics.ListCreateAPIView):
     ordering = ["-updated_at"]
 
     def get_queryset(self):
+        """Reviews filtered by business user and reviewer."""
         params = self.request.query_params
         filters = {
             "business_user_id": parse_id(params, "business_user_id"),
@@ -43,6 +44,7 @@ class ReviewListView(generics.ListCreateAPIView):
         return Review.objects.filter(**active)
 
     def perform_create(self, serializer):
+        """Saves the review; a duplicate becomes a 400 error."""
         try:
             with transaction.atomic():
                 serializer.save(reviewer=self.request.user)

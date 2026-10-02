@@ -42,4 +42,5 @@ class Order(models.Model):
         ordering = ["-created_at"]
 
     def __str__(self):
+        """Order title with status."""
         return f"{self.title} ({self.status})"

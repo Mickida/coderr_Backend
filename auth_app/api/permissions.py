@@ -7,6 +7,7 @@ class IsProfileOwnerOrReadOnly(BasePermission):
     """Allows reading any profile but editing only your own."""
 
     def has_object_permission(self, request, view, obj):
+        """Read for everyone; write only on your own profile."""
         if request.method in SAFE_METHODS:
             return True
         return obj.user_id == request.user.id
@@ -24,6 +25,7 @@ class IsBusinessUserOrReadOnly(BasePermission):
     message = "Only business users can perform this action."
 
     def has_permission(self, request, view):
+        """Safe methods for all; writes only for business users."""
         if request.method in SAFE_METHODS:
             return True
         return has_profile_type(request.user, Profile.BUSINESS)
@@ -35,6 +37,7 @@ class IsCustomerUserOrReadOnly(BasePermission):
     message = "Only customer users can perform this action."
 
     def has_permission(self, request, view):
+        """Safe methods for all; writes only for customer users."""
         if request.method in SAFE_METHODS:
             return True
         return has_profile_type(request.user, Profile.CUSTOMER)
