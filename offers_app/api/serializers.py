@@ -3,9 +3,11 @@ from decimal import Decimal
 from django.db import transaction
 from rest_framework import serializers
 
+from auth_app.api.validators import validate_image_size
 from offers_app.models import Offer, OfferDetail
 
 MAX_INT = 2_147_483_647  # largest value of a database integer column
+MAX_FEATURES = 20
 REQUIRED_OFFER_TYPES = {
     OfferDetail.BASIC, OfferDetail.STANDARD, OfferDetail.PREMIUM,
 }
@@ -22,7 +24,8 @@ class OfferDetailSerializer(serializers.ModelSerializer):
         max_digits=10, decimal_places=2, min_value=Decimal("0")
     )
     features = serializers.ListField(
-        child=serializers.CharField(max_length=255), allow_empty=False
+        child=serializers.CharField(max_length=255), allow_empty=False,
+        max_length=MAX_FEATURES,
     )
 
     class Meta:
@@ -121,6 +124,10 @@ class OfferWriteSerializer(serializers.ModelSerializer):
             )
         return details
 
+    def validate_image(self, image):
+        """Rejects images larger than the allowed size."""
+        return validate_image_size(image)
+
     @transaction.atomic
     def create(self, validated_data):
         """Creates the offer together with its packages."""
@@ -136,9 +143,18 @@ class OfferWriteSerializer(serializers.ModelSerializer):
         """Updates the offer and the packages matched by offer_type."""
         details = validated_data.pop("details", [])
         instance = super().update(instance, validated_data)
+        self.update_details(instance, details)
+        return instance
+
+    def update_details(self, instance, details):
+        """Updates the packages matched by offer_type; 400 if missing."""
+        packages = {d.offer_type: d for d in instance.details.all()}
         for data in details:
-            detail = instance.details.get(offer_type=data["offer_type"])
+            detail = packages.get(data["offer_type"])
+            if detail is None:
+                raise serializers.ValidationError({"details": [
+                    f"This offer has no {data['offer_type']} package."
+                ]})
             for attr, value in data.items():
                 setattr(detail, attr, value)
             detail.save()
-        return instance

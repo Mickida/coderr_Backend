@@ -2,6 +2,7 @@ from django.contrib.auth.models import User
 from django.db import transaction
 from rest_framework import serializers
 
+from auth_app.api.validators import validate_image_size
 from auth_app.models import Profile
 
 
@@ -74,6 +75,10 @@ class ProfileSerializer(serializers.ModelSerializer):
             "email", "created_at",
         ]
         read_only_fields = ["user", "type", "created_at"]
+
+    def validate_file(self, image):
+        """Rejects images larger than the allowed size."""
+        return validate_image_size(image)
 
     def validate_email(self, value):
         """Rejects an email used by another user."""

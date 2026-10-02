@@ -21,7 +21,7 @@ def create_order_from_detail(detail, customer):
     """Copies the package data into a new order for the customer."""
     return Order.objects.create(
         customer_user=customer,
-        business_user=detail.offer.user,
+        business_user_id=detail.offer.user_id,
         title=detail.title,
         revisions=detail.revisions,
         delivery_time_in_days=detail.delivery_time_in_days,
