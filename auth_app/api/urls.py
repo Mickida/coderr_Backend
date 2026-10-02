@@ -1,6 +1,7 @@
 from django.urls import path
 
 from auth_app.api.views import (
+    BaseInfoView,
     BusinessProfileListView,
     CustomerProfileListView,
     LoginView,
@@ -17,4 +18,5 @@ urlpatterns = [
          name="profiles-business"),
     path("profiles/customer/", CustomerProfileListView.as_view(),
          name="profiles-customer"),
+    path("base-info/", BaseInfoView.as_view(), name="base-info"),
 ]

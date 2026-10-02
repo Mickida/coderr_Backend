@@ -1,4 +1,5 @@
 from django.contrib.auth import authenticate
+from django.db.models import Avg
 from rest_framework import generics, status
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -14,6 +15,8 @@ from auth_app.api.serializers import (
     RegistrationSerializer,
 )
 from auth_app.models import Profile
+from offers_app.models import Offer
+from reviews_app.models import Review
 
 
 def build_auth_payload(user):
@@ -85,3 +88,20 @@ class CustomerProfileListView(generics.ListAPIView):
         type=Profile.CUSTOMER
     )
     serializer_class = CustomerProfileListSerializer
+
+
+class BaseInfoView(APIView):
+    """Public platform statistics shown on the landing page."""
+
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        average = Review.objects.aggregate(avg=Avg("rating"))["avg"]
+        return Response({
+            "review_count": Review.objects.count(),
+            "average_rating": round(average or 0, 1),
+            "business_profile_count": Profile.objects.filter(
+                type=Profile.BUSINESS
+            ).count(),
+            "offer_count": Offer.objects.count(),
+        })
