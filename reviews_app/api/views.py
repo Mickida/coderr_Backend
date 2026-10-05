@@ -1,6 +1,4 @@
-from django.db import IntegrityError, transaction
 from rest_framework import generics
-from rest_framework.exceptions import ValidationError
 from rest_framework.filters import OrderingFilter
 from rest_framework.permissions import IsAuthenticated
 
@@ -44,14 +42,8 @@ class ReviewListView(generics.ListCreateAPIView):
         return Review.objects.filter(**active)
 
     def perform_create(self, serializer):
-        """Saves the review; a duplicate becomes a 400 error."""
-        try:
-            with transaction.atomic():
-                serializer.save(reviewer=self.request.user)
-        except IntegrityError:
-            raise ValidationError({"business_user": [
-                "You have already reviewed this business user."
-            ]})
+        """Saves the review with the requesting user as reviewer."""
+        serializer.save(reviewer=self.request.user)
 
 
 class ReviewSingleView(generics.UpdateAPIView, generics.DestroyAPIView):
