@@ -1,4 +1,3 @@
-from django.contrib.auth import authenticate
 from django.db.models import Avg
 from rest_framework import generics, status
 from rest_framework.authtoken.models import Token
@@ -52,14 +51,11 @@ class LoginView(APIView):
 
     def post(self, request):
         """Checks the credentials and returns the auth token."""
-        serializer = LoginSerializer(data=request.data)
+        serializer = LoginSerializer(
+            data=request.data, context={"request": request}
+        )
         serializer.is_valid(raise_exception=True)
-        user = authenticate(request, **serializer.validated_data)
-        if user is None:
-            return Response(
-                {"detail": "Invalid credentials."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+        user = serializer.validated_data["user"]
         return Response(build_auth_payload(user), status=status.HTTP_200_OK)
 
 

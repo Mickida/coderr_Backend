@@ -46,3 +46,13 @@ starts empty, so register them once (e.g. via the frontend or
   username.
 - An invalid token is rejected with 401, even on `/api/login/`. After a
   database reset, log out in the frontend first.
+- The offer list (`GET /api/offers/`) and `GET /api/base-info/` are
+  public; all other read endpoints require authentication.
+- The offer list is paginated with 6 offers per page (`?page_size=`
+  overrides it).
+- Uploaded images (profile `file`, offer `image`) may be at most 5 MB.
+  They are stored in `media/` and served by Django only while
+  `DEBUG = True`.
+- `DEBUG` is enabled and `ALLOWED_HOSTS` is empty; the settings are meant
+  for local development only.
+- The project's own test suite is not part of this repository.
