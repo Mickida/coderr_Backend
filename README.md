@@ -13,12 +13,6 @@ venv\Scripts\activate          # macOS / Linux: source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-Create a `.env` file with a secret key:
-
-```bash
-python -c "from django.core.management.utils import get_random_secret_key as key; open('.env', 'w').write('SECRET_KEY=' + key() + '\n')"
-```
-
 Set up the database and start the server:
 
 ```bash
