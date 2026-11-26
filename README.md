@@ -3,6 +3,12 @@
 REST API for Coderr, a freelancer marketplace. Built with Django and
 Django REST Framework.
 
+- **Live demo:** https://coderr.daniel-micklausch.de
+- **API:** https://mickida.pythonanywhere.com/api/
+- **Frontend:** [coderr_Frontend](https://github.com/Mickida/coderr_Frontend)
+
+Developed as part of the Developer Akademie GmbH training program.
+
 ## Setup
 
 1. Clone the repository:
@@ -29,7 +35,7 @@ python -m venv venv
 venv\Scripts\activate
 ```
 
-   or on macOS / Linux:
+or on macOS / Linux:
 
 ```bash
 source venv/bin/activate
@@ -66,11 +72,11 @@ project; by default CORS allows `http://127.0.0.1:5500` and
 
 ## Environment variables
 
-| Variable | Default | Description |
-|---|---|---|
-| `SECRET_KEY` | – (required) | Django secret key |
-| `DEBUG` | `False` | `True` for local development |
-| `ALLOWED_HOSTS` | `localhost,127.0.0.1` | Comma-separated host names of the backend |
+| Variable           | Default                                       | Description                                        |
+| ------------------ | --------------------------------------------- | -------------------------------------------------- |
+| `SECRET_KEY`       | – (required)                                  | Django secret key                                  |
+| `DEBUG`            | `False`                                       | `True` for local development                       |
+| `ALLOWED_HOSTS`    | `localhost,127.0.0.1`                         | Comma-separated host names of the backend          |
 | `FRONTEND_ORIGINS` | `http://127.0.0.1:5500,http://localhost:5500` | Comma-separated frontend origins for CORS and CSRF |
 
 ## Deployment (PythonAnywhere)
@@ -92,9 +98,9 @@ python manage.py migrate
 python manage.py collectstatic
 ```
 
-5. In the *Web* tab, create a manual configuration web app, set the
+5. In the _Web_ tab, create a manual configuration web app, set the
    virtualenv path and point the WSGI file to `core.wsgi`.
-6. Add two static file mappings in the *Web* tab: `/static/` →
+6. Add two static file mappings in the _Web_ tab: `/static/` →
    `<project>/static` and `/media/` → `<project>/media`.
 7. Reload the web app.
 
@@ -104,10 +110,10 @@ The frontend's guest login buttons expect these users. The database
 starts empty, so register them once (e.g. via the frontend or
 `POST /api/registration/`):
 
-| Username | Password | Type |
-|---|---|---|
+| Username | Password | Type     |
+| -------- | -------- | -------- |
 | `daniel` | `asdasd` | customer |
-| `kevin` | `asdasd` | business |
+| `kevin`  | `asdasd` | business |
 
 ## Notes
 
