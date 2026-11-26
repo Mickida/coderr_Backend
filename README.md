@@ -5,23 +5,98 @@ Django REST Framework.
 
 ## Setup
 
+1. Clone the repository:
+
 ```bash
 git clone <repository-url>
+```
+
+2. Change into the project folder:
+
+```bash
 cd coderr_Backend
+```
+
+3. Create a virtual environment:
+
+```bash
 python -m venv venv
-venv\Scripts\activate          # macOS / Linux: source venv/bin/activate
+```
+
+4. Activate it on Windows:
+
+```bash
+venv\Scripts\activate
+```
+
+   or on macOS / Linux:
+
+```bash
+source venv/bin/activate
+```
+
+5. Install the dependencies:
+
+```bash
 pip install -r requirements.txt
 ```
 
-Set up the database and start the server:
+6. Copy `.env.example` to `.env` and set `SECRET_KEY`. A secret key
+   can be generated with:
+
+```bash
+python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
+```
+
+7. Create the database tables:
 
 ```bash
 python manage.py migrate
+```
+
+8. Start the server:
+
+```bash
 python manage.py runserver
 ```
 
 The API runs at `http://127.0.0.1:8000/api/`. The frontend is a separate
-project; CORS allows `http://127.0.0.1:5500` and `http://localhost:5500`.
+project; by default CORS allows `http://127.0.0.1:5500` and
+`http://localhost:5500`.
+
+## Environment variables
+
+| Variable | Default | Description |
+|---|---|---|
+| `SECRET_KEY` | – (required) | Django secret key |
+| `DEBUG` | `False` | `True` for local development |
+| `ALLOWED_HOSTS` | `localhost,127.0.0.1` | Comma-separated host names of the backend |
+| `FRONTEND_ORIGINS` | `http://127.0.0.1:5500,http://localhost:5500` | Comma-separated frontend origins for CORS and CSRF |
+
+## Deployment (PythonAnywhere)
+
+1. Clone the repository in a Bash console, create the virtual environment
+   and install the dependencies as described in the setup.
+2. Create `.env` with a new `SECRET_KEY`, `DEBUG=False`,
+   `ALLOWED_HOSTS=<username>.pythonanywhere.com` and
+   `FRONTEND_ORIGINS=https://<your-frontend-domain>`.
+3. Create the database tables:
+
+```bash
+python manage.py migrate
+```
+
+4. Collect the static files (admin, browsable API):
+
+```bash
+python manage.py collectstatic
+```
+
+5. In the *Web* tab, create a manual configuration web app, set the
+   virtualenv path and point the WSGI file to `core.wsgi`.
+6. Add two static file mappings in the *Web* tab: `/static/` →
+   `<project>/static` and `/media/` → `<project>/media`.
+7. Reload the web app.
 
 ## Guest logins
 
@@ -46,7 +121,5 @@ starts empty, so register them once (e.g. via the frontend or
   overrides it).
 - Uploaded images (profile `file`, offer `image`) may be at most 5 MB.
   They are stored in `media/` and served by Django only while
-  `DEBUG = True`.
-- `DEBUG` is enabled and `ALLOWED_HOSTS` is empty; the settings are meant
-  for local development only.
+  `DEBUG=True`; in production the web server serves them.
 - The project's own test suite is not part of this repository.
